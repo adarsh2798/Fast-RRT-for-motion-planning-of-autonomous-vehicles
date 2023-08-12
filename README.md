@@ -50,5 +50,5 @@ Final path generated from start to goal by FastRRT is shown below in "CYAN" colo
 </p>
 
 Below is a simulation of the above algorithm on gazebo, where a ackermann bot navigates through obstacle course.
-<video src='your URL here' width=180/>
+<video src='https://github.com/adarsh2798/Fast-RRT-for-motion-planning-of-autonomous-vehicles/blob/main/FastRRT/visulaizations/run3%20(online-video-cutter.com).mp4' width=180/>
 

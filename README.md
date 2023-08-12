@@ -29,10 +29,15 @@ Now that the tree is properly initalized, the next part of algorithm is, perform
 
 RRT is normal RRT but since tree is already intilaized, RRT random branches will more likely extend towards desired goal point. This solves the meandering problem. This is because of VORONOI BIAS. As can be seen from above image, the trimmed tree has leaf nodes that are in direction towards goal point at (-1,9). Since these nodes has larger voronoi regions associated with them, the RRT is more likely to extend branches from those nodes compared to other nodes from the tree. This means RRT is more likley to extedn towards goal instead of randomly extending at some other node and "meandering away". This also ensures lesser RRT samples and faster convergence. See the image below.
 <p align="center">
-  <img src="https://github.com/adarsh2798/Fast-RRT-for-motion-planning-of-autonomous-vehicles/blob/main/FastRRT/visulaizations/trimmed_tree_template.png" />
+  <img src="https://github.com/adarsh2798/Fast-RRT-for-motion-planning-of-autonomous-vehicles/blob/main/FastRRT/visulaizations/sample1_RRT_plus_template.png" />
 </p>
 
 
 Next is aggressive extension. This directly tries to generate a trajectory from the nearest node to goal in existing tree toward goal point. This can be done by trajectory optimization where intial state is the nearset node and final state is goal node. Once the trajectory found, if it reaches goal point without any collsions, algorithm ends, else the trimmed part of the trajectory is added to existing tree and the loop continues.
 
-Belo
+Below image shows an illsutration of above. The "BLUE" lines are the branches of intilized tree through rule template trajectories. The "MAGENTA" lineas are the branches extended by aggressive extension. The "GREEN" lines are the branches extended by RRT. Nodes are marked by "RED DOTS".
+
+<p align="center">
+  <img src="https://github.com/adarsh2798/Fast-RRT-for-motion-planning-of-autonomous-vehicles/blob/main/FastRRT/visulaizations/sample1_RRT_plus_template.png" />
+</p>
+

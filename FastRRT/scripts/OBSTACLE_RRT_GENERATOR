@@ -1,0 +1,153 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.animation as animation
+import random
+import math
+import matplotlib
+from edge_collision_checker import *
+q_start=(-1,0)
+
+
+
+# edges of obstacles and environment boundary
+edges=[  [(-5.853, 2.448),(3.873, 2.448)] , [(3.873, 2.448),(6.107, -2.448)],  [(6.107, -2.448),(-3.619, -2.448)],   [(-3.619, -2.448),(-5.853, 2.448)] ,
+         [(-1.528,-0.1877),(-1.99,0.06)],   [(-1.99,0.06), (-2.47,-0.81)]  ,  [(-2.47,-0.81), (-2,-1.06)]         ,  [(-2,-1.06),(-1.528,-0.1877) ],
+         [(0.5,0.41), (1,0.7)],             [(1,0.7), (0.5,1.58)],             [(0.5,1.58),(-0.007,1.28)],             [(-0.007,1.28),(0.5,0.41)],
+         [(3.1,0.3),(2.1,0.6)],             [(2.1,0.6), (1.8,-0.3)],          [(1.8,-0.3),(2.8,-0.6)],               [(2.8,-0.6),(3.1,0.3)]               ]    
+#bounds of environment
+x_min=-5.853
+x_max=6.107
+y_min=-2.448
+y_max=2.448
+
+
+# see copy, these define the ||lelogram
+v=np.array([-3.619, -2.448])
+a=np.array([-5.853, 2.448])
+b=np.array([6.107, -2.448])
+v_a=a-v
+v_b=b-v
+
+
+# in this animation line is a sequence of x,y points, so animation draw line through hat x,y seq in that order, it is in form x_data,y_data np.ndARRAY
+def update_RRT(num, line):
+    
+    global edges
+   
+    x_data, y_data = line.get_data() # current x,y seq
+
+    x_data=list(x_data)
+    y_data=list(y_data)
+    if len(x_data) == 0 or len(y_data) == 0:
+        x_data.append(q_start[0])
+        y_data.append(q_start[1])
+    
+
+    
+   
+    # new samples for RRT
+    new_x=np.random.uniform(x_min,x_max) 
+    new_y=np.random.uniform(y_min,y_max)
+    collides=True
+    sample_within_bounds=False
+    
+    # see copy for how to check if point lies inside ||logram
+    pp=np.array([[new_x],[new_y]])
+    p=pp-v
+    mat=np.array([[ v_a[0], v_b[0]     ],[ v_a[1], v_b[1]    ]])
+    val=np.matmul(np.linalg.inv(mat),p)
+
+    if  0<=val[0,0]<=1 and 0<=val[1,0]<=1:
+      sample_within_bounds=True
+    if(sample_within_bounds):
+        min_dist=math.inf
+        cnt=0
+        min_index=0
+        # finding point closest to new sample in current RRT
+        for p in zip(x_data,y_data):
+          curr_dist=((new_x-p[0])**2 + (new_y-p[1])**2)**0.5
+      
+      
+          if(curr_dist<min_dist):
+            min_index=cnt
+          min_dist=min(curr_dist,min_dist)
+          cnt+=1
+        closest_point=(x_data[min_index],y_data[min_index])
+        step_size=0.2 #step_size to grow branch
+        # new point to insert in tree is just the vector addition of closest point and step size times position vector b/w new and closest point
+        point_to_insert=np.array([[closest_point[0]],[closest_point[1]]])+step_size*(-np.array([[closest_point[0]],[closest_point[1]]])+np.array([[new_x],[new_y]]))
+
+    
+
+
+        #collision_check
+        segment=[(closest_point[0],closest_point[1]),(point_to_insert[0,0],point_to_insert[1,0])]
+        
+     
+        collides=edge_inter_obstacle(edges,segment)
+        
+        
+       
+
+
+    
+
+
+        if(not collides):
+            # as mentioned above, animation draws line through the seq in that order, so to add anew branch we initally add new node after th closest point,
+            # i.e min_index+1, but we again have to add closest point after new node, coz else tha animation will connect this new node to next new node in next iter
+            # SEE:  WHAT ANIATION DOES IS DRAWS LINES THROUGH X,Y IN THAT SPECIFIED ORDER, SO IMAGINE A RRT, WITH RANDOM BRANCHS AT RANDOM NODES.  
+            # HOW  WOULD YOU TRACE IT WITH YOUR HAND, OBVIO WE NEED TO GO TO SOME RANDOM LEAF THROUGH S ERIES OF BRANCHES AND SINCE WE REACH END
+            # WE HAVE TO BACKTRACT TO MOVE TO NEXT BRANCH. TO BACKTRACK WE NEED THE PREVIOUS POINT RIGHT? THIS PREV POINT IS THE CLOSEST POINT TO
+            # THE NEW NODE ADDED EVERY ITERATIONA AND HENCE WE HAVE TO AGAIN ADD THAT PREV/CLOSEST POINT AFTER NEW NODE FOR BACKTRACKING 
+    
+            x_data.insert(min_index+1,float(point_to_insert[0]))
+            y_data.insert(min_index+1,float(point_to_insert[1]))
+            x_data.insert(min_index+2,closest_point[0])
+            y_data.insert(min_index+2,closest_point[1])
+
+
+
+
+    
+    
+ 
+    x_data=np.array(x_data)
+    y_data=np.array(y_data)
+     
+    line.set_data(x_data, y_data)
+
+    # Return the updated line object
+    
+    return line,
+
+
+
+
+
+fig = plt.figure(dpi=5*72)
+ax = fig.add_subplot(111)
+
+
+
+for e in edges:
+    
+    plt.plot([e[0][0],e[1][0]],[e[0][1],e[1][1]],color='black',linewidth=2)
+
+
+ax.set_aspect('equal')
+plt.xlim([-7,7])
+plt.ylim([-3,3])
+
+# Create the initial line segment
+line, = ax.plot([], [], 'r-')
+
+# Create the animation
+ani = animation.FuncAnimation(fig, update_RRT, frames=np.arange(0, 1000, 0.1),
+                              fargs=(line,), interval=50, blit=True)
+
+FFMpegWriter=animation.writers['ffmpeg']
+writer=animation.FFMpegWriter()
+
+ani.save("temp.mp4",writer=writer)
+

@@ -1,0 +1,92 @@
+import numpy as np
+from scipy.integrate import quad
+
+x_0=0
+y_0=0
+x_f=4
+y_f=4
+theta_0=np.pi/2
+theta_f=np.pi/2
+k_0=0.01
+k_f=0.1
+
+
+def C_integrand(s,a,b,c,d,n):
+  return (s**n)*np.cos(a * s + b * s**2 + c * s**3 / 3 + d * s**4 / 4)
+
+def S_integrand(s,a,b,c,d,n):
+  return (s**n)*np.sin(a * s + b * s**2 + c * s**3 / 3 + d * s**4 / 4)
+
+
+def C(s, a, b, c, d,n):
+
+    result, error = quad(C_integrand, 0, s, args=(a, b, c, d,n),epsabs=1e-8, epsrel=1e-8)
+    return result
+
+def S(s, a, b, c, d,n):
+
+    result, error = quad(S_integrand, 0, s, args=(a, b, c, d,n),epsabs=1e-8, epsrel=1e-8)
+    return result
+
+
+
+def g(q):
+  a,b,c,d,s=q
+  h1=C(s,a,b,c,d,0)
+  h2=S(s,a,b,c,d,0)
+  h3=(a*s)+((b*s**2)/2)+((c*s**3)/3)+((d*s**4)/4)
+  h4=a+(b*s)+(c*s**2)+(d*s**3)
+
+  h5=0
+  h6=0
+  h7=0
+  h8=a
+  cons=np.array([h1-x_f,h2-y_f,h3-theta_f,h4-k_f          ])
+  return cons
+
+
+def Jac(q):
+  a,b,c,d,s=q
+  x_q=np.array([-S(s,a,b,c,d,1)  ,  -S(s,a,b,c,d,2)/2,   -S(s,a,b,c,d,3)/3, -S(s,a,b,c,d,4)/4,   np.cos((a*s)+((b*s**2)/2)+((c*s**3)/3)+((d*s**4)/4))     ])
+  y_q=np.array([C(s,a,b,c,d,1)  ,  -C(s,a,b,c,d,2)/2,   -C(s,a,b,c,d,3)/3, -C(s,a,b,c,d,4)/4,   np.sin((a*s)+((b*s**2)/2)+((c*s**3)/3)+((d*s**4)/4))      ])
+  theta_q=np.array([ s, (s**2)/2,(s**3)/3,(s**4)/4,    a+(b*s)+(c*s**2)+(d*s**3) ])
+  k_q=np.array([1,s,s**2,s**3, b+(2*c*s)+(3*d*s**2)])
+
+  Jacobian=np.vstack((x_q[1:],y_q[1:],theta_q[1:],k_q[1:]))
+  return Jacobian
+
+
+# Initialize q with an initial guess that satisfies some or none of the boundary conditions
+initial_guess = [k_0, 1, 1,1,0.1]
+
+# Define the desired tolerance for convergence
+tolerance = 1e-6
+
+# Maximum number of iterations to prevent infinite loops
+max_iterations = 500
+
+# Iterate to find q* that satisfies the boundary conditions using Newton-Raphson method
+q = np.array(initial_guess)
+for iteration in range(max_iterations):
+    #print(q[-1])
+    J = Jac(q)
+    gg = g(q)
+
+    delta_q = -np.matmul(np.linalg.inv(J) ,gg)
+
+    delta_q=np.insert(delta_q,0,0)
+
+
+    q = q + delta_q
+    if np.linalg.norm(gg) < tolerance:
+        break
+print(np.linalg.norm(gg) )
+# After the loop, q* will be the feasible solution that satisfies the boundary conditions
+print("Feasible solution q*:", q)
+
+
+    
+
+
+
+

@@ -8,5 +8,13 @@ RRT, in it's vanilla form suffers from meandering and meaningless search. In cas
 To overcome the meandering issue, a rule template based approach is used. Using a high level module, if the car can sense it's current surrounding in urban roads, we can assume it can do 4 distict maneuvers: go staright, turn right, turn left, U-turn. Hence instead of dirently use RRT from starting point, we INITIALIZE the tree with a bunch of trajectories that correspond to either of the 4 above mentioned maneuvers. For example, if car is already moving staright, and there is an obstacle (static),  right ahead , then, car has to keep moving straight while avoiding that obstacles.
 In such a case we can use the "go forward" rule template to initialize the tree.
 A bunch of terminal positions (x,y) and a terminal heading of 90-degrees are specified, meaning car has to reach there facing forward. I have used 'trajectory optimization' using collocation methods to generate trajectories from initial to final state here.
-![Rule template for STRAIGHT maneuvers](Image URL)
 
+<p align="center">
+  <img src="https://github.com/adarsh2798/Fast-RRT-for-motion-planning-of-autonomous-vehicles/blob/main/FastRRT/visulaizations/go_straight_trajectories.png" />
+</p>
+
+I created a sample world in gazebo for simulation purpose of this algorithm, it has 4 obstacles and the template generated in that world looks like this:
+
+<p align="center">
+  <img src="https://github.com/adarsh2798/Fast-RRT-for-motion-planning-of-autonomous-vehicles/blob/main/FastRRT/visulaizations/go_straight_trajectories.png" />
+</p>

@@ -16,5 +16,12 @@ A bunch of terminal positions (x,y) and a terminal heading of 90-degrees are spe
 I created a sample world in gazebo for simulation purpose of this algorithm, it has 4 obstacles and the template generated in that world looks like this:
 
 <p align="center">
-  <img src="https://github.com/adarsh2798/Fast-RRT-for-motion-planning-of-autonomous-vehicles/blob/main/FastRRT/visulaizations/go_straight_trajectories.png" />
+  <img src="https://github.com/adarsh2798/Fast-RRT-for-motion-planning-of-autonomous-vehicles/blob/main/FastRRT/visulaizations/rule_template_go_straight_tree_generated.png" />
+</p>
+
+Now this tree in intilized with some trajectories. Next step is to TRIM the tree depending on whether they collide with obstacle or go out of desired lane boundaries. After trimming the tree looks like:
+
+
+<p align="center">
+  <img src="https://github.com/adarsh2798/Fast-RRT-for-motion-planning-of-autonomous-vehicles/blob/main/FastRRT/visulaizations/rule_template_go_straight_tree_generated.png" />
 </p>

@@ -44,7 +44,7 @@ Below image shows an illsutration of above. The "BLUE" lines are the branches of
 Final path generated from start to goal by FastRRT is shown below in "CYAN" color.
 
 <p align="center">
-  <img src="https://github.com/adarsh2798/Fast-RRT-for-motion-planning-of-autonomous-vehicles/blob/main/FastRRT/visulaizations/rule_template_go_straight_tree_generated(1).png" />
+  <img src="https://github.com/adarsh2798/Fast-RRT-for-motion-planning-of-autonomous-vehicles/blob/main/FastRRT/visulaizations/path(1).png" />
 </p>
 
 
